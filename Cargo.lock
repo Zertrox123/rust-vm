@@ -230,6 +230,7 @@ dependencies = [
 name = "vm-db"
 version = "0.1.0"
 dependencies = [
+ "cryptify",
  "vm-core",
 ]
 

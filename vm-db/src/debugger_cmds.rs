@@ -1,6 +1,29 @@
 use vm_core::vm::OP;
-
+use vm_core::vm::OP::*;
 use crate::debugger::Debugger;
+use cryptify;
+
+pub const OPCODE_ARG_SIZES: &[(OpCode, usize)] = &[
+    (OpCode::FN,    1),
+    (OpCode::Nyaa,  1),
+    (OpCode::Meow,  1),
+    (OpCode::Nay,   0),
+    (OpCode::Push,  1),
+    (OpCode::Pop,   0),
+    (OpCode::Add,   0),
+    (OpCode::Sub,   0),
+    (OpCode::Jmp,   1),
+    (OpCode::Jz,    1),
+    (OpCode::Call,  1),
+    (OpCode::Ret,   0),
+    (OpCode::Load,  0),
+    (OpCode::Store, 2),
+    (OpCode::Print, 1),
+    (OpCode::Input, 0),
+    (OpCode::Eq,    0),
+    (OpCode::Check, 0),
+    (OpCode::Debug, 0),
+];
 
 impl Debugger {
     fn cmd_next(&mut self, cmds: &Vec<String>) -> Result<(), ()> {
@@ -54,7 +77,60 @@ impl Debugger {
         Err(())
     }
 
-    fn cmd_disp(&mut self, cmds: &Vec<String>) -> Result<(), ()> {
+    fn cmd_debug(&mut self, cmds: &Vec<String>) -> Result<(), ()> {
+        let var = cryptify::encrypt_string!("==========DEBUG DUMP===========");
+        let stack_msg = cryptify::encrypt_string!("==========STACK DUMP===========");
+        let start = self.vm.pc.saturating_sub(3);
+        let mut end = self.vm.pc + 4;
+        let mut arg_size = 0;
+        println!("{}", var);
+        let mut i = start;
+        loop {
+            if i >= end || i >= self.vm.ram_len()  {
+                break;
+            }
+            let o = self.vm.get_raw(i).unwrap_or(0);
+            let op = OpCode::iterator().find(|&op_enum| op_enum as u8 == o);
+            let display_value = match op {
+                Some(op_found) => format!("{:?}", op_found),
+                None => {
+                    i += 1;
+                    end += 1;
+                    continue;
+                },
+            };
+            if let Some(op_found) = op {
+                for (opcode, size) in OPCODE_ARG_SIZES {
+                    if *opcode as u8 == op_found as u8 {
+                        arg_size = *size;
+                        break;
+                    }
+                }
+            }
+            if i == self.vm.pc {
+                print!("-> {i}: {}(", display_value);
+            } else {
+                print!("   {i}: {}(", display_value);
+            }
+            for o in 0..arg_size {
+                print!("{}", self.vm.get_raw(i + (o+ 1)).unwrap_or(0));
+                if o != arg_size - 1 {
+                print!(" ");
+
+                }
+            }
+                println!(")");
+
+            i += arg_size;
+            end += arg_size;
+            i+=1;
+        }
+        println!();
+        println!("{}", stack_msg);
+        for i in 0..self.vm.stack.len() {
+            println!("{i}: {}", self.vm.stack.get(i).unwrap());
+        }
+        println!();
         Ok(())
     }
 
@@ -66,14 +142,14 @@ impl Debugger {
             "next" | "n" => {
                 return self.cmd_next(&cmds);
             }
-            "display" | "disp" | "d" => {
-                return self.cmd_break(&cmds);
-            }
             "break" | "breakpoint" | "b" => {
                 return self.cmd_break(&cmds);
             }
             "exit" => {
                 return self.cmd_exit(&cmds);
+            }
+            "debug" | "d" => {
+                return self.cmd_debug(&cmds);
             }
             _ => {}
         }

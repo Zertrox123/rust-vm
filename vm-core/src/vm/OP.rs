@@ -81,6 +81,7 @@ pub fn impl_Nyaa(pc: &mut usize, ram: &mut RAM::RAM, stack: &mut Vec<u8>, key: u
     *pc += 2;
     false
 }
+
 pub fn impl_Meow(pc: &mut usize, ram: &mut RAM::RAM, stack: &mut Vec<u8>, key: u8) -> bool {
     stack.push(b'M');
     stack.push(b'e');

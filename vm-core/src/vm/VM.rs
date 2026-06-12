@@ -21,13 +21,14 @@ use crate::vm::{
 pub struct VM {
     pub ram: RAM::RAM,
     func_table: HashMap<u8, usize>,
-    stack: Vec<u8>,
+    pub stack: Vec<u8>,
     pub pc: usize,
-    key: Zeroizing<u8>,
+    pub key: Zeroizing<u8>,
     last_op_time: Option<Instant>,
     crash_in_10: bool,
     crash_counter: u8,
     time: SystemTime,
+    len: usize,
 }
 
 impl VM {
@@ -47,6 +48,7 @@ impl VM {
             crash_in_10: false,
             crash_counter: 0,
             time: time::SystemTime::now(),
+            len: 0,
         }
     }
 
@@ -77,6 +79,7 @@ impl VM {
         }
         println!();
     }
+
     pub fn get_raw(&mut self, id: usize) -> Option<u8> {
         Some(self.ram.get(id).unwrap() ^ *self.key)
     }
@@ -281,10 +284,11 @@ impl VM {
 
     pub fn add_byte(&mut self, byte: u8) {
         self.ram.push(byte as u8 ^ *self.key);
+        self.len += 1
     }
 
     pub fn ram_len(&self) -> usize {
-        self.ram.len()
+        return self.len
     }
 
     pub fn corrupt_ram(&mut self) {

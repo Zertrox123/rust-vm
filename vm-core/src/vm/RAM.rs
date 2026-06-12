@@ -1,8 +1,5 @@
 use std::{
-    io::Result,
-    ops::{self, Index},
-    time::UNIX_EPOCH,
-    u8,
+    io::Result, ops::{self, Index}, process::id, time::UNIX_EPOCH, u8
 };
 
 use zeroize::Zeroizing;
@@ -57,8 +54,12 @@ impl RAM {
 
     pub fn get(&self, pc: usize) -> Result<u8> {
         let idx = pc ^ *self.key;
+        if idx >= self.ram.len() {
+            return Ok(0)
+        }
         Ok(self.ram[idx])
     }
+    
 
     pub fn len(&self) -> usize {
         self.count
