@@ -1,8 +1,8 @@
 # Rust VM
 
-Une petite machine virtuelle et interpréteur de bytecode codé en Rust.
+Une petite machine virtuelle et interpréteur de bytecode codé en Rust
 
-Décode les instructions, gère la mémoire et exécute les opérations sur la pile.
+Décode les instructions, gère la mémoire et exécute les opérations sur la pile
 
 ## Lancement
 
