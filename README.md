@@ -1,17 +1,21 @@
 # Rust VM
 
-Custom bytecode virtual machine and assembly execution engine in Rust.
+Machine virtuelle modulaire et interpréteur de bytecode assembleur en Rust.
 
-## Overview
+## Présentation
 
-Modular virtual machine architecture featuring instruction decoding, memory management, and binary execution.
+Moteur d'émulation bas niveau en Rust comprenant le décodage d'instructions binaires, la gestion de registres et la pile d'exécution.
 
-## Getting Started
+## Prérequis
+
+- Rust et Cargo
+
+## Compilation et Lancement
 
 ```bash
-# Build
+# Compiler en mode release
 cargo build --release
 
-# Run
+# Lancer la machine virtuelle
 cargo run --bin vm-bin
 ```
